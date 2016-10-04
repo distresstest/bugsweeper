@@ -43,6 +43,7 @@ UP_RIGHT = 0
  
 
 # Initial vars
+done = False     # Loop until the user clicks the close button.
 HiddenSquares = GRID_SIZE * GRID_SIZE
 Clicks = 0
 Bugs = 0
@@ -70,21 +71,13 @@ for row in range(GRID_SIZE):
         x = random.randint(1, 4)
         grid[row][column] = {'ColorIndex' : x, 'Color' : ColorArray[x], 'Hidden' : True }
 
+
 # Initialize pygame
-pygame.init()
-screen = pygame.display.set_mode(WINDOW_SIZE)
-
-# Set title of screen
-pygame.display.set_caption("Bug Sweeper")
- 
-# Loop until the user clicks the close button.
-done = False
- 
-# Used to manage how fast the screen updates
-clock = pygame.time.Clock()
-
-# Set the screen background
-screen.fill(BLACK)
+pygame.init()                                    # Initialise pygame
+screen = pygame.display.set_mode(WINDOW_SIZE)    # Set up screen
+pygame.display.set_caption("Bug Sweeper")        # Set display caption
+clock = pygame.time.Clock()                      # Used to manage how fast the screen updates
+screen.fill(BLACK)                               # Set screen background colour
 
 
 # -------- Main Program Loop -----------
@@ -92,22 +85,39 @@ screen.fill(BLACK)
 
 while not done:
     for event in pygame.event.get():  # User did something
-        #print ("Current Event = ", evene.type)
         if event.type == pygame.QUIT:  # If user clicked close
-            #("CLICKED!!!!!!!!!!!!!!!!!!!!!!!!!" + str(event.type))
             #pygame.quit()
             #sys.exit() 
             done = True  # Flag that we are done so we exit this loop
         elif event.type == pygame.MOUSEBUTTONDOWN:
             # User clicks the mouse. Get the position
             pos = pygame.mouse.get_pos()
-            # Change the x/y screen coordinates to grid coordinates
             column = pos[0] // (WIDTH + MARGIN)
             row = pos[1] // (HEIGHT + MARGIN)
-            # Set that location to 9 (WHITE)
-            grid[row][column]['Color'] = WHITE
-            Clicks = Clicks + 1
-#            ("Click ", pos, "Grid coordinates: ", row, column)
+            print(" COL = ", column)
+            print(" ROW = ", row)
+            # Change the x/y screen coordinates to grid coordinates if inside the grid
+            if (column < GRID_SIZE) and (row < GRID_SIZE):
+                # Get the color...
+                CurrCol = grid[row][column]['Color']
+                # Get Random number floating between 0.0 and 1.0
+                Random = random.random()
+                if (CurrCol == RED) and (ProbRedBug > Random  ):
+                    Bugs = Bugs + 1
+                if (CurrCol == BLUE) and (ProbBlueBug > Random  ):
+                    Bugs = Bugs + 1
+                if (CurrCol == GREEN) and (ProbGreenBug > Random  ):
+                    Bugs = Bugs + 1
+                if (CurrCol == YELLOW) and (ProbYellowBug > Random  ):
+                    Bugs = Bugs + 1
+
+              
+
+
+
+                grid[row][column]['Color'] = WHITE
+                Clicks = Clicks + 1
+            # ("Click ", pos, "Grid coordinates: ", row, column)
             # Check if you found a bug
             # Get clicked square colour
             # work out probability
@@ -180,12 +190,12 @@ while not done:
     HiddenSquares = 0
     TotalColors = len(ColorArray)
     ColorCount = []
-    print TotalColors
+    
     for i in range(TotalColors):
         ColorCount.append(0)
 
+    # print ("Starting to draw grid")
     screen.fill(BLACK)
-    print ("Starting to draw grid")
     for row in range(GRID_SIZE):
         for column in range(GRID_SIZE):
 
@@ -208,12 +218,16 @@ while not done:
                 ColorCount[i] = ColorCount[i] + 1
                 print ColorCount[i]
 
-
-
     time.sleep(0.1) 
     BugsFoundMsg = 'Bugs found..........' + str(Bugs)
 
     font = pygame.font.Font(None, 16)
+
+
+
+    BugsFoundMsg = 'Bugs found..........' + str(Bugs)
+    text = font.render(BugsFoundMsg, 1,WHITE)
+    screen.blit(text, (370,100))
 
 
     ClickMsg = 'Clicks...' + str(Clicks)
