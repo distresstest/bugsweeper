@@ -51,6 +51,7 @@ ProbBlueBug = 0.5
 ProbRedBug = 0.1
 ProbYellowBug = 0.3
 ProbGreenBug = 0.7
+H=0
 
 
 # Some functions...
@@ -94,12 +95,13 @@ while not done:
             pos = pygame.mouse.get_pos()
             column = pos[0] // (WIDTH + MARGIN)
             row = pos[1] // (HEIGHT + MARGIN)
-            print(" COL = ", column)
-            print(" ROW = ", row)
+            #print(" COL = ", column)
+            #print(" ROW = ", row)
             # Change the x/y screen coordinates to grid coordinates if inside the grid
             if (column < GRID_SIZE) and (row < GRID_SIZE):
                 # Get the color...
                 CurrCol = grid[row][column]['Color']
+
                 # Get Random number floating between 0.0 and 1.0
                 Random = random.random()
                 if (CurrCol == RED) and (ProbRedBug > Random  ):
@@ -111,23 +113,9 @@ while not done:
                 if (CurrCol == YELLOW) and (ProbYellowBug > Random  ):
                     Bugs = Bugs + 1
 
-              
-
-
-
+                # Update "clicked" square colour to white
                 grid[row][column]['Color'] = WHITE
                 Clicks = Clicks + 1
-            # ("Click ", pos, "Grid coordinates: ", row, column)
-            # Check if you found a bug
-            # Get clicked square colour
-            # work out probability
-            
-            
-            # Update "clicked" square colour to white
-
-
-
-    # Update overlay
 
     # Set current cell to middle
     CurrRow = MID_ROW
@@ -190,22 +178,24 @@ while not done:
     HiddenSquares = 0
     TotalColors = len(ColorArray)
     ColorCount = []
-    
+    H = 0 
     for i in range(TotalColors):
         ColorCount.append(0)
 
     # print ("Starting to draw grid")
     screen.fill(BLACK)
-    for row in range(GRID_SIZE):
-        for column in range(GRID_SIZE):
+    for row in range(GRID_SIZE-1):
+        for column in range(GRID_SIZE-1):
 
             # = ColorCount[grid[row][column]['ColorIndex']] + 1
             if grid[row][column]['Hidden'] == True:
                 HiddenSquares = HiddenSquares + 1
+                print("Hidden Squares...",HiddenSquares)
                 ColorVar = GREY
+                H = H + 1
             else:
                 ColorVar = grid[row][column]['Color']
-           # print ("ColorVar = " + str(ColorVar))
+            # print ("ColorVar = " + str(ColorVar))
             pygame.draw.rect(screen,
                              ColorVar,
                              [(MARGIN + WIDTH) * column + MARGIN,
@@ -214,21 +204,16 @@ while not done:
                               HEIGHT])
             if grid[row][column]['Hidden'] == False:
                 i = grid[row][column]['ColorIndex']
-                print (">", row, column,i)
+                # print (">", row, column,i)
                 ColorCount[i] = ColorCount[i] + 1
-                print ColorCount[i]
-
+                # print ColorCount[i]
+    print H
     time.sleep(0.1) 
-    BugsFoundMsg = 'Bugs found..........' + str(Bugs)
-
     font = pygame.font.Font(None, 16)
-
-
 
     BugsFoundMsg = 'Bugs found..........' + str(Bugs)
     text = font.render(BugsFoundMsg, 1,WHITE)
     screen.blit(text, (370,100))
-
 
     ClickMsg = 'Clicks...' + str(Clicks)
     text = font.render(ClickMsg, 1,WHITE)
@@ -257,11 +242,15 @@ while not done:
 
 
 
-# Limit to 60 fres per second
+    # Limit to 60 fres per second
     clock.tick(60)
  
     # Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
+    if HiddenSquares == 0:
+        done = True
+#        print("Hidden Squares = 0 !!!!")
+
  
 # Be IDLE friendly. If you forget this line, the program will 'hang'
 # on exit.
